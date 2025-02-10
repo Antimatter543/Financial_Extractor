@@ -1,12 +1,3 @@
-# Method 1: Using PyPDF2 (simpler)
-from PyPDF2 import PdfReader
-
-def read_pdf_pypdf2(pdf_path):
-    reader = PdfReader(pdf_path)
-    text = ""
-    for page in reader.pages:
-        text += page.extract_text()
-    return text
 
 # Method 2: Using pdfplumber (better at maintaining formatting)
 import pdfplumber
@@ -30,16 +21,7 @@ def extract_pdf_by_pages(pdf_path):
     return pages_text
 
 
-# Try both methods
-pdf_path = "fwc_sample_financial_statement 1.pdf"  # replace with your PDF path
-
-# Using PyPDF2
-print("=== Using PyPDF2 ===")
-try:
-    text_pypdf = read_pdf_pypdf2(pdf_path)
-    print(text_pypdf)  # Print first 500 characters
-except Exception as e:
-    print(f"PyPDF2 error: {e}")
+pdf_path = "fwc_sample_financial_statement 1.pdf" 
 
 # Using pdfplumber
 print("\n=== Using pdfplumber ===")

@@ -1,0 +1,49 @@
+I'm gonna word everything into my own words because I want to actually properly do this.
+
+It's sunday 11PM.
+I have 5 (really, 4 days) to do this.
+
+>>> We need to extract key metrics like revenue, net income, ....
+>>> And generate a SUMMARY REPORT highlighting theh elath of the company.
+
+
+///// WHAT WE NEED TO HAVE BY THE END OF IT (deliverables)
+===> So we need the code (scripts & explore ipynb?) 
+===> The metrics in a csv,
+===> A summary report for 2-3 financial statements? (we only have one financial statement?)
+	=> I guess we'll be given others; im sure we can also just grab some online from the same place
+===> A report describing approach, challenges faced, solutions implemeneted? (Would just documentation be enough? Like explore.ipynb thing?)
+
+===> README md with instructions on running soluiton
+
+
+
+WE ARE EVALUATED ON:
+- if it's correct lol
+- if we did deliverables
+- Code quality (I guess don't put random stuff everywhere)
+- Scalability -- did we consider how to scale etc? RAG RAG RAG
+
+Submit w/ GITHUB REPO
+Organise!
+
+
+
+SOOOOOO OKAY now our things we have to do:
+
+
+1) Extract the data (easy, pdfplumber we've already done)
+2) Data preprocessing -- clean it up (no headers footers page numbers; segment well; validate somehow (check sums are correct?))
+3) GENAI model -- idk huggingface API or something, just shove the pandas df from ^^^ into it, give some context, anaylse.
+	==> 
+
+4) Generate a summary report that includes 
+	Key financial metrics (revenue, net income blah)
+	Notable Trends or observations
+	Short summary in normal (well, natural financial) language ig 
+
+5) Discuss/implemnent scaling stragies for model, for a ton of fianncial statements: RAG? RAG RAG RAG? But also what other ways I wonder
+
+
+We have 4 days to do this :::: Monday: 
+Tidy up 
