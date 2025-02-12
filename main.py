@@ -55,9 +55,10 @@ def main():
     segmented_tables = split_into_sections_regex(cleaned_text)
     print(f"✅ Split into {len(segmented_tables)} sections.")
 
-    print(" Step 4: Processing tables with GenAI and saving CSVs...")
-    process_and_save_tables(segmented_tables)
-    print("✅ All tables processed and saved as CSVs!")
+    # Generates data when needed.
+    # print(" Step 4: Processing tables with GenAI and saving CSVs...")
+    # process_and_save_tables(segmented_tables)
+    # print("✅ All tables processed and saved as CSVs!")
 
     print(" Step 5: Generating financial summary report...")
     csv_text = read_csv_files(CSV_DIR)
