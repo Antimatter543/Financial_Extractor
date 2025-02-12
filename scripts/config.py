@@ -26,7 +26,4 @@ def get_genai_client():
     if not api_key:
         raise ValueError("❌ No API key found. Please check your .env file.")
 
-    print("✅ API key loaded successfully!")
-
-    
     return genai.Client(api_key=api_key)

@@ -21,7 +21,6 @@ Usage:
 
 from dotenv import load_dotenv
 import os
-from google import genai
 import google.genai.types as types
 import json
 import re
@@ -61,7 +60,15 @@ def gemini_financial_extraction(tabular_text: str, model: str = "gemini-2.0-flas
 
 
 def clean_json_response(text):
-    """Extracts valid JSON from text by removing markdown code blocks and extra text."""
+    """
+    Extracts valid JSON content from AI-generated text by removing markdown code blocks and unnecessary formatting.
+
+    Args:
+        text (str): AI response containing JSON.
+
+    Returns:
+        str: Extracted valid JSON string, or None if no valid JSON found.
+    """
     # Remove ```json ... ``` wrapping
     text = re.sub(r"```json\s*", "", text)  # Remove opening block
     text = re.sub(r"\s*```$", "", text)  # Remove closing block
@@ -75,8 +82,17 @@ def clean_json_response(text):
 # Loop through all segmented tables and process them
 
 def save_csv(table_name, csv_content, directory=DATA_DIR):
-    """Saves extracted CSV data to a file in the /data directory."""
-    
+    """
+    Saves extracted CSV data to a file in the /data directory.
+
+    Args:
+        table_name (str): Name of the table, used for the filename.
+        csv_content (str): The extracted CSV data as a string.
+        directory (str): Path to the directory where the file should be saved.
+
+    Returns:
+        None
+    """
     # Ensure a valid filename
     safe_table_name = table_name.replace(" ", "_").lower()
     file_path = os.path.join(directory, f"{safe_table_name}.csv")

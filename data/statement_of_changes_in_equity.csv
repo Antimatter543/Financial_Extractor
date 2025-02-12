@@ -1,8 +1,8 @@
-Asset Revaluation Reserve,Retained Earnings,Total
-0,6186000,5209000
-342000,0,342000
-0,1367000,1367000
-342000,6576000,6918000
-0,0,0
-0,529000,529000
-342000,7105000,7447000
+Asset Revaluation Reserve,$ ,Retained Earnings,$ ,Total,$
+0,6186000,5209000,0
+Revaluation increment,342000,0,342000
+Profit for the year,0,1367000,1367000
+Closing balance as at,342000,6576000,6918000
+Revaluation increment,0,0,0
+Profit for the year,0,529000,529000
+Closing balance as at,342000,7105000,7447000
