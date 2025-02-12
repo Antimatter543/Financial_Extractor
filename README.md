@@ -1,6 +1,7 @@
 
 
 
+#### General Pipeline Structure
 ```mermaid
 graph TD
     A[PDF] --> B[Extract]
