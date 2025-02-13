@@ -21,14 +21,16 @@ After some reading I came across various OCR tools (AWS textract, marker) for ex
 
 *However,* whilst GMFT has great metrics, with this pdf type it performed very poorly. After some research into its usage, gmft seems to be designed for actual tables in scientific journals (close together and compressed), whilst this pdf is **majority of white space, and tables often span multiple pages**, so it couldn't deal with this well.
 
+**Subtables:** I had considered whether to segment the tables into subtables (e.g Income statement has Revenues, Expenses, ...) but eventually decided against this as manually doing this would be somewhat time consuming (considering different name variations, caps lock differences like Table 3/4, ...) and if fed into a GenAI model, this would marginally increase the token size anyways and not yield any real benefit. Furthermore, opening the fully extracted table `.csv`'s in Excel gives a very human-readable view regardless.
+
 
 #### **Final Approach:**
 - **PDF Parsing**: Extract raw text using `pdfplumber`. Whilst noticeably slower than `pypdf2`, it had fewer missing characters, making it a better tradeoff when accuracy is important such as this use case. Ideally, a pdf should only be extracted once so this slow difference is not a large issue either.
 - **Cleaning:** Removed headers, footers, and page numbers to ensure clean data (and less tokens for LLMs to consume)
 - **Segmentation**: Used regex-based splitting to break down the document into individual financial statements as each main table was followed by the sentence `The above statement should be read in conjunction with the notes.`. (Income Statement, Balance Sheet, etc.). Initially, I considered simple .split() but opted for regex for better flexibility across different document formats.
 
-**Validation:**
 
+**Validation:**
 
 ### 3.2 Financial Data Extraction Using GenAI
 
@@ -39,6 +41,7 @@ After some reading I came across various OCR tools (AWS textract, marker) for ex
 - **GenAI Extraction**: Instead of writing hardcoded extraction logic which is hard to scale, I leveraged GenAI to extract structured JSON directly from text-based financial tables as these are much more flexible and easier to scale with.
 
 #### Selecting The Correct GenAI Model
+
 **Local Models:"** Since I wanted to test **local LLMs for privacy reasons**, I initially tried **DeepSeek-R1 (1.5B) running on an ollama serve**, but it **performed poorly**. Some issues:
 - **Repeated values** appeared in extracted tables.
 - **Hallucination** of financial figures, often using the Notes table instead.
@@ -76,6 +79,23 @@ I experimented with different prompts and repeating the same prompts to see the 
 2. Sent them to Gemini 2.0 to generate a markdown-based financial summary.
 3. Converted the markdown summary into a well-structured PDF report using `markdownpdf`.
 
+### 3.4 Considering Scale
+## Phase 5 - Scaling And Stuff
+
+#### For scaling preprocessing
+
+We currently use a mix of manual table names w/ regex patterns which is fine here, but in more varied datasets we may have some errors as people use slightly different words/terminology that falls through the regex patterns. So potentially using NLP based methods (like spacy, etc.) would help here. 
+
+
+#### RAG:
+Potential for RAG for greater reliability or some sort of pre-processed database so the PDF reading and processing doesn't have to happen every time.
+
+With RAG, you can retrieve more accurate answers while still being able to ask the GenAI model any query.
+
+RAG is a trade-off of speed for accuracy, but for large databases, it’s pretty practical because of context limits (i.e., you can’t throw 10,000 docs into the LLM, so use a retriever to find 5 relevant documents instead!).
+
+### Other ideas:
+- Deploying on cloud (AWS lambda) for better pipelines and scalability (e.g preprocessing function runs whenever new pdf is inputted, then thrown into a database)
 
 
 ## **4. Challenges & Solutions**
