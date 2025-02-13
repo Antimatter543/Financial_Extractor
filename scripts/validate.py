@@ -66,7 +66,7 @@ def validate_csv_numbers(directory="./data", debug: bool = True):
                             #If passes, prints a check
                             if debug:
                                 print(f"  ✅ Row {row_number}, Col {col_number}: '{value}' is a valid number.")
-    print(counts)
+    print(f"You have {counts['valid']} valid rows and {counts['non-valid']} non-valid rows.")
     return counts
 if __name__ == '__main__':
     validate_csv_numbers()

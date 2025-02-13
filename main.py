@@ -33,6 +33,8 @@ Run the script in the terminal:
 import os
 from scripts.preprocess_data import extract_full_text, clean_text, split_into_sections_regex
 from scripts.generate_tables import process_and_save_tables
+from scripts.validate import validate_csv_numbers
+
 from scripts.genai_summary import read_csv_files, generate_summary_report, save_markdown_to_pdf
 
 # Define file paths
@@ -55,10 +57,13 @@ def main():
     segmented_tables = split_into_sections_regex(cleaned_text)
     print(f"✅ Split into {len(segmented_tables)} sections.")
 
-    # Generates data when needed.
+    # Generates data when needed -- This does override the current csvs so I've commented it out for now.
     # print(" Step 4: Processing tables with GenAI and saving CSVs...")
     # process_and_save_tables(segmented_tables)
     # print("✅ All tables processed and saved as CSVs!")
+    # validate_csv_numbers(CSV_DIR, debug = True)
+
+
 
     print(" Step 5: Generating financial summary report...")
     csv_text = read_csv_files(CSV_DIR)

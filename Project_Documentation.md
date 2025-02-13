@@ -11,7 +11,11 @@ The goal of this project is to:
 
 ## **3. Methodology & Thought Process**
 
-The solution is implemented as a **multi-step pipeline**, consisting of:
+Given the context of the problem I placed ideals these as important:
+- We REALLY want to keep the right figures, so potentially trying lower end models for this, while it can be accurate a fair amount of the time, likely does not counteract the risk of it eventually hallucinating (comes in later for scaling strategies). 
+- Not all LLMs are equal.
+
+
 
 ### **3.1 Extracting Text & Preprocessing Data**
 #### **Thought Process:** 
@@ -21,7 +25,7 @@ After some reading I came across various OCR tools (AWS textract, marker) for ex
 
 *However,* whilst GMFT has great metrics, with this pdf type it performed very poorly. After some research into its usage, gmft seems to be designed for actual tables in scientific journals (close together and compressed), whilst this pdf is **majority of white space, and tables often span multiple pages**, so it couldn't deal with this well.
 
-**Subtables:** I had considered whether to segment the tables into subtables (e.g Income statement has Revenues, Expenses, ...) but eventually decided against this as manually doing this would be somewhat time consuming (considering different name variations, caps lock differences like Table 3/4, ...) and if fed into a GenAI model, this would marginally increase the token size anyways and not yield any real benefit. Furthermore, opening the fully extracted table `.csv`'s in Excel gives a very human-readable view regardless.
+**Sub-Tables:** I had considered whether to segment the tables into sub-tables (e.g Income statement has Revenues, Expenses, ...) but eventually decided against this as manually doing this would be somewhat time consuming (considering different name variations, caps lock differences like Table 3/4, ...) and if fed into a GenAI model, this would marginally increase the token size anyways and not yield any real benefit. Furthermore, opening the fully extracted table `.csv`'s in Excel gives a very human-readable view regardless.
 
 
 #### **Final Approach:**
@@ -30,7 +34,10 @@ After some reading I came across various OCR tools (AWS textract, marker) for ex
 - **Segmentation**: Used regex-based splitting to break down the document into individual financial statements as each main table was followed by the sentence `The above statement should be read in conjunction with the notes.`. (Income Statement, Balance Sheet, etc.). Initially, I considered simple .split() but opted for regex for better flexibility across different document formats.
 
 
-**Validation:**
+### **Validation:**
+ Validation (especially in the context of finances) is incredibly important. However, most of the methods I could think of were hard to achieve or required considerable time investment. E.g comparing automated strategies (LLMs vs coded extracted dataframes) could work, but in the event of a disagreement, which is correct? Manual intervention is likely necessary. In the end, my validation strategy was quite simple - validate all csv's are using floats (numbers, and not random 'O's instead of zeros, etc), and manually checking between csv and pdf for any issues/inaccuracies. More time spent on this is recommended, such as implementing sum checks to check if fields add up to the totals.
+
+
 
 ### 3.2 Financial Data Extraction Using GenAI
 
@@ -88,11 +95,10 @@ We currently use a mix of manual table names w/ regex patterns which is fine her
 
 
 #### RAG:
-Potential for RAG for greater reliability or some sort of pre-processed database so the PDF reading and processing doesn't have to happen every time.
-
+Potential for RAG for greater reliability or some sort of pre-processed database so the PDF reading and processing doesn't have to happen every time. 
 With RAG, you can retrieve more accurate answers while still being able to ask the GenAI model any query.
 
-RAG is a trade-off of speed for accuracy, but for large databases, it’s pretty practical because of context limits (i.e., you can’t throw 10,000 docs into the LLM, so use a retriever to find 5 relevant documents instead!).
+RAG is a trade-off of speed for accuracy, but for large databases, this is pretty practical because of context limits (i.e., you can’t throw 10,000 docs into the LLM, so use a retriever to find 5 relevant documents instead!).
 
 ### Other ideas:
 - Deploying on cloud (AWS lambda) for better pipelines and scalability (e.g preprocessing function runs whenever new pdf is inputted, then thrown into a database)
@@ -102,14 +108,17 @@ RAG is a trade-off of speed for accuracy, but for large databases, it’s pretty
 
 ### **4.1 Extracting Tabular Data from PDFs**
 **Challenge:** Financial statements often contain complex tabular structures, making data extraction non-trivial. Some tables contained **multi-line headers** (e.g., "Asset Revaluation Reserve"), which broke naive parsing approaches.
+
 **Solution:** Used **regex-based pattern matching** and structured parsing methods. Considered a generalized function for all tables but opted for **segmented extraction** to ensure accuracy.
 
 ### **4.2 Handling Variations in Financial Statements**
 **Challenge:** Different companies use different formats for their financial reports, making it difficult to build a one-size-fits-all parser.
+
 **Solution:** Implemented **flexible regex patterns** and prompt engineering to allow for structured AI extraction across different document layouts. Manual table type classification was considered but ultimately deemed inefficient for scalability.
 
 ### **4.3 Ensuring Accuracy in AI-Extracted Data**
 **Challenge:** GenAI may hallucinate or misinterpret some figures, particularly when handling **financial negative values** (e.g., bracketed losses `(123,000)` may not always be recognized as negative values).
+
 **Solution:** Applied **post-processing validation**, ensuring extracted values match expected financial ranges and formats. The model was instructed explicitly to **preserve all negative signs** and format numbers correctly.
 
 ## **5. Results**
@@ -118,7 +127,8 @@ RAG is a trade-off of speed for accuracy, but for large databases, it’s pretty
 - **Scalability Considerations:** The pipeline was designed to allow **future expansion into a RAG-based system**, where preprocessed tables could be stored for retrieval and querying instead of rerunning extraction on every query.
 
 ## **6. Future Improvements**
-- **Enhance data validation** by integrating a rule-based financial integrity check.
+- **Enhance data validation** by integrating a rule-based financial integrity check - such as implementing sum checks to check if fields add up to the totals.
+
 - **Explore Local AI Models:** Investigated **deepseek-r1:1.5B** as a potential local alternative but noted that larger models (e.g., 70B) would be preferable for accuracy. **Privacy concerns** regarding API-based processing could be mitigated with a locally deployed high-parameter model.
 - **Optimize Preprocessing for Large-Scale Processing:** Current preprocessing relies on regex for table names, but NLP-based classification (e.g., `spacy`) could improve robustness across varied datasets.
 
