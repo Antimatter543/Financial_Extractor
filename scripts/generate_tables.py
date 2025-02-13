@@ -28,12 +28,6 @@ import re
 from scripts.config import get_genai_client
 
 
-
-# Ensure the /data directory exists
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data")
-os.makedirs(DATA_DIR, exist_ok=True)
-
-
 ## Using free tier so 15RPM w/ 1 million context window
 def gemini_financial_extraction(tabular_text: str, model: str = "gemini-2.0-flash"):
     """
@@ -79,21 +73,9 @@ def clean_json_response(text):
         return match.group(0)  # Return extracted JSON
     return None
 
-# Loop through all segmented tables and process them
 
-def save_csv(table_name, csv_content, directory=DATA_DIR):
-    """
-    Saves extracted CSV data to a file in the /data directory.
-
-    Args:
-        table_name (str): Name of the table, used for the filename.
-        csv_content (str): The extracted CSV data as a string.
-        directory (str): Path to the directory where the file should be saved.
-
-    Returns:
-        None
-    """
-    # Ensure a valid filename
+def save_csv(table_name: str, csv_content: str, directory: str):
+    """Saves extracted CSV data to a file in the specified directory."""
     safe_table_name = table_name.replace(" ", "_").lower()
     file_path = os.path.join(directory, f"{safe_table_name}.csv")
 
@@ -102,9 +84,16 @@ def save_csv(table_name, csv_content, directory=DATA_DIR):
 
     print(f"✅ Saved: {file_path}")
 
-
-def process_and_save_tables(segmented_tables):
-    """Processes segmented tables, extracts structured data via GenAI, and saves CSVs."""
+def process_and_save_tables(segmented_tables, output_dir: str):
+    """
+    Processes segmented tables and saves CSVs to the specified output directory.
+    
+    Args:
+        segmented_tables (list): List of table text segments to process
+        output_dir (str): Directory where CSV files should be saved
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    
     for idx, table_text in enumerate(segmented_tables):
         response = gemini_financial_extraction(table_text)
         json_data = clean_json_response(response.text)
@@ -114,13 +103,10 @@ def process_and_save_tables(segmented_tables):
             continue
 
         try:
-            parsed_data = json.loads(json_data)  # Convert JSON text to a Python dictionary
-            
-            table_name = parsed_data.get("table_name", f"financial_table_{idx+1}")  # Default name if missing
-            csv_content = parsed_data.get("csv_data", "")  # Extract CSV content
-
-            save_csv(table_name, csv_content)
-
+            parsed_data = json.loads(json_data)
+            table_name = parsed_data.get("table_name", f"financial_table_{idx+1}")
+            csv_content = parsed_data.get("csv_data", "")
+            save_csv(table_name, csv_content, output_dir)
         except json.JSONDecodeError:
             print(f"❌ Failed to parse JSON for table {idx+1}")
-            continue  # Skip and move to the next table
+            continue

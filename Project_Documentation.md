@@ -35,7 +35,7 @@ After some reading I came across various OCR tools (AWS textract, marker) for ex
 
 
 ### **Validation:**
- Validation (especially in the context of finances) is incredibly important. However, most of the methods I could think of were hard to achieve or required considerable time investment. E.g comparing automated strategies (LLMs vs coded extracted dataframes) could work, but in the event of a disagreement, which is correct? Manual intervention is likely necessary. In the end, my validation strategy was quite simple - validate all csv's are using floats (numbers, and not random 'O's instead of zeros, etc), and manually checking between csv and pdf for any issues/inaccuracies. More time spent on this is recommended, such as implementing sum checks to check if fields add up to the totals.
+ Validation (especially in the context of finances) is incredibly important. However, most of the methods I could think of were hard to achieve or required considerable time investment. E.g comparing automated strategies (LLMs vs coded extracted dataframes) could work, but in the event of a disagreement, which is correct? Manual intervention is likely necessary. In the end, my validation strategy was quite simple - validate all csv's are using floats (numbers, and not random 'O's instead of zeros, etc), and manually checking between csv and pdf for any issues/inaccuracies. More time spent on this is recommended, such as implementing sum checks to check if fields add up to the totals. This found **100%** validation accuracy on `Gemini 2.0`, whilst `deepseek-r1:1.5b` had **~53%** accuracy (due to notes in the tables, incorrect symbols and missing values).
 
 
 
@@ -87,22 +87,32 @@ I experimented with different prompts and repeating the same prompts to see the 
 3. Converted the markdown summary into a well-structured PDF report using `markdownpdf`.
 
 ### 3.4 Considering Scale
-## Phase 5 - Scaling And Stuff
 
-#### For scaling preprocessing
+#### 3.4.1 For scaling preprocessing
 
 We currently use a mix of manual table names w/ regex patterns which is fine here, but in more varied datasets we may have some errors as people use slightly different words/terminology that falls through the regex patterns. So potentially using NLP based methods (like spacy, etc.) would help here. 
 
 
-#### RAG:
-Potential for RAG for greater reliability or some sort of pre-processed database so the PDF reading and processing doesn't have to happen every time. 
+#### 3.4.2 Retrieval-Augmented Generation (RAG)
+To improve reliability and efficiency at scale, implementing a RAG-based system offers several advantages:
+
+Pre-processed Database: Storing extracted financial data eliminates repeated PDF processing
+Contextual Retrieval: Enables accurate responses by retrieving relevant document segments
+Efficient Processing: Handles large document collections by retrieving only pertinent information
+Context Window Management: Addresses LLM token limitations by selecting relevant context (although for this size, using Gemini yields no immediate issues)
+
 With RAG, you can retrieve more accurate answers while still being able to ask the GenAI model any query.
 
-RAG is a trade-off of speed for accuracy, but for large databases, this is pretty practical because of context limits (i.e., you can’t throw 10,000 docs into the LLM, so use a retriever to find 5 relevant documents instead!).
+#### 3.4.3 Cloud Infrastructure Considerations
+For production deployment, several cloud-based improvements could be implemented:
 
-### Other ideas:
-- Deploying on cloud (AWS lambda) for better pipelines and scalability (e.g preprocessing function runs whenever new pdf is inputted, then thrown into a database)
+AWS Lambda Functions: Automating PDF processing on upload
+Database Integration: Storing processed financial data for quick retrieval
+Scalable Processing Pipeline: Handling multiple documents concurrently
+Automated Validation: Implementing systematic checks for data accuracy
 
+#### 3.4.4 Directory Structure Improvements
+ Our initial implementation used a flat directory structure where all outputs (CSVs and reports) were saved directly to top-level /data and /reports directories. This quickly becomes messy and hard to manage when processing multiple financial statements, as files from different sources would mix together and potentially overwrite each other. To address this, the code was changed to create separate subdirectories for each processed PDF, with filenames derived from the input PDF name. For example, processing company_x_2023.pdf now creates organized directories like /data/company_x_2023/ for CSVs and /reports/company_x_2023/ for the summary report. This makes the system much more organized and easier to maintain as we scale up to process more documents.
 
 ## **4. Challenges & Solutions**
 
@@ -119,7 +129,7 @@ RAG is a trade-off of speed for accuracy, but for large databases, this is prett
 ### **4.3 Ensuring Accuracy in AI-Extracted Data**
 **Challenge:** GenAI may hallucinate or misinterpret some figures, particularly when handling **financial negative values** (e.g., bracketed losses `(123,000)` may not always be recognized as negative values).
 
-**Solution:** Applied **post-processing validation**, ensuring extracted values match expected financial ranges and formats. The model was instructed explicitly to **preserve all negative signs** and format numbers correctly.
+**Solution:** Applied **post-processing validation**, ensuring extracted values match expected financial ranges and formats. The model was instructed explicitly to **preserve all negative signs** and format numbers correctly, with 100% accuracy on `Gemini 2.0`.
 
 ## **5. Results**
 - **Extracted Financial Tables:** CSV files containing structured financial metrics.
@@ -131,6 +141,9 @@ RAG is a trade-off of speed for accuracy, but for large databases, this is prett
 
 - **Explore Local AI Models:** Investigated **deepseek-r1:1.5B** as a potential local alternative but noted that larger models (e.g., 70B) would be preferable for accuracy. **Privacy concerns** regarding API-based processing could be mitigated with a locally deployed high-parameter model.
 - **Optimize Preprocessing for Large-Scale Processing:** Current preprocessing relies on regex for table names, but NLP-based classification (e.g., `spacy`) could improve robustness across varied datasets.
+
+-- Leverage Large database data science tools (DuckDB, Tableau, etc..) - Unfortunately, no current experience with this but I'd definitely be down to learn more about it!
+
 
 ## **7. Conclusion**
 This project successfully demonstrates how AI can be leveraged for financial data extraction and analysis. By automating the pipeline, we improve efficiency and accuracy in handling large-scale financial documents. Considerations for future scalability, including **cloud-based deployment** and **retrieval-augmented generation (RAG)**, offer opportunities to make financial data extraction even more robust and dynamic.
