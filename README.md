@@ -32,7 +32,8 @@ graph TD
 │── .env                  # API keys and config variables
 │── main.py               # Runs the full pipeline
 │── requirements.txt       # Python dependencies
-│── README.md             # Project documentation
+│── Project_Documentation.md       # Project documentation & reasoning
+│── README.md            
 ```
 
 ## **Setup Instructions**
