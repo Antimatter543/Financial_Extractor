@@ -87,6 +87,7 @@ I experimented with different prompts and repeating the same prompts to see the 
 3. Converted the markdown summary into a well-structured PDF report using `markdownpdf`.
 
 ### 3.4 Considering Scale
+I also considered SQL architectures to allow for better scaling, but I think this depends on how much variation there could be in the table formats -- e.g how many possible column/field names could we have? I definitely would like help from more experienced people to understand what could be done here.
 
 #### 3.4.1 For scaling preprocessing
 
@@ -103,13 +104,16 @@ Context Window Management: Addresses LLM token limitations by selecting relevant
 
 With RAG, you can retrieve more accurate answers while still being able to ask the GenAI model any query.
 
+**Although**, this might actually be overkill -- most of the data stored would be either as csv's or raw text strings as numbers and table names, which doesn't really play to the strengths of RAG. You could instead simply store these under some titles for a given company and easily search them up that way.
+
 #### 3.4.3 Cloud Infrastructure Considerations
 For production deployment, several cloud-based improvements could be implemented:
 
-AWS Lambda Functions: Automating PDF processing on upload
-Database Integration: Storing processed financial data for quick retrieval
-Scalable Processing Pipeline: Handling multiple documents concurrently
-Automated Validation: Implementing systematic checks for data accuracy
+- AWS Lambda Functions: Automating PDF processing on upload
+- Database Integration: Storing processed financial data for quick retrieval
+- Scalable Processing Pipeline: Handling multiple documents concurrently
+- Automated Validation: Implementing systematic checks for data accuracy
+
 
 #### 3.4.4 Directory Structure Improvements
  Our initial implementation used a flat directory structure where all outputs (CSVs and reports) were saved directly to top-level /data and /reports directories. This quickly becomes messy and hard to manage when processing multiple financial statements, as files from different sources would mix together and potentially overwrite each other. To address this, the code was changed to create separate subdirectories for each processed PDF, with filenames derived from the input PDF name. For example, processing company_x_2023.pdf now creates organized directories like /data/company_x_2023/ for CSVs and /reports/company_x_2023/ for the summary report. This makes the system much more organized and easier to maintain as we scale up to process more documents.
