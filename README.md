@@ -3,6 +3,8 @@
 ## **Overview**
 This project automates the extraction, processing, and analysis of financial statements using GenAI. It processes financial PDFs, extracts key financial data, and generates structured CSVs and a final summary report.
 
+The process, justification, and future recommendations the final pipeline is documented in **Project Documentation.md** (different to README), and the raw jupyter notebook is `explore.ipynb`
+
 ## **Pipeline Workflow**
 ```mermaid
 graph TD
