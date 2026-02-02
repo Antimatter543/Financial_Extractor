@@ -5,6 +5,8 @@ This project automates the extraction, processing, and analysis of financial sta
 
 The process, justification, and future recommendations the final pipeline is documented in **Project Documentation.md** (different to README), and the raw jupyter notebook is in `exploring.ipynb`.
 
+Smashed their interviews, still got rejected because the role they wanted to make for me, they didn't have headcount or something? Not sure. Past life. Anyways.
+
 ## **Pipeline Workflow**
 ```mermaid
 graph TD
